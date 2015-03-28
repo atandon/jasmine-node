@@ -11,97 +11,97 @@ baseArgv = _.without process.argv, "--autoTest"
 # If this is a TTY and --noColor wasn't specified, force some color because
 # autoTest will cause isTTY to be false for later iterations
 if process.stdout.isTTY and not ('--noColor' in baseArgv)
-    unless '--forceColor' in baseArgv
-        baseArgv.splice(2, 0, '--forceColor')
+  unless '--forceColor' in baseArgv
+    baseArgv.splice(2, 0, '--forceColor')
 
 # Start in a dirty state
 lastRunSuccessful = false
 
 runExternal = (command, args, callback) ->
-    child = child_process.spawn command, args
-    child.stdout.on 'data', (data) ->
-        process.stdout.write data
+  child = child_process.spawn command, args
+  child.stdout.on 'data', (data) ->
+    process.stdout.write data
 
-    child.stderr.on 'data', (data) ->
-        process.stderr.write data
+  child.stderr.on 'data', (data) ->
+    process.stderr.write data
 
-    if _.isFunction callback
-        child.on 'exit', callback
+  if _.isFunction callback
+    child.on 'exit', callback
 
-    return
+  return
 
 runEverything = ->
-    # run the suite when it starts
-    argv = [].concat baseArgv
-    runExternal argv.shift(), argv, (code) ->
-        lastRunSuccessful = code is 0
-        return
+  # run the suite when it starts
+  argv = [].concat baseArgv
+  runExternal argv.shift(), argv, (code) ->
+    lastRunSuccessful = code is 0
     return
+  return
 
 start = (loadPaths, watchFolders, patterns) ->
-    watchPatterns = null
+  watchPatterns = null
 
-    loadPathFunc = (loadPath) ->
-        # If loadPath is just a single file, we should just watch that file
-        stats = fs.statSync loadPath
-        if stats.isFile()
-            watchPatterns = loadPath
+  loadPathFunc = (loadPath) ->
+    # If loadPath is just a single file, we should just watch that file
+    stats = fs.statSync loadPath
+    if stats.isFile()
+      watchPatterns = loadPath
+    else
+      watchPatterns = patterns.map (p) ->
+        return path.join loadPath, p
+
+    changedFunc = (event, file) ->
+      console.log "#{file} was changed"
+
+      match = path.basename(file, path.extname(file)) + ".*"
+      match = match.replace new RegExp("spec", "i"), ""
+
+      argv = [].concat baseArgv, ["--match", match]
+      runExternal argv.shift(), argv, (code) ->
+        # run everything if we fixed some bugs
+        if code is 0
+          runEverything() unless lastRunSuccessful
         else
-            watchPatterns = patterns.map (p) ->
-                return path.join loadPath, p
+          lastRunSuccessful = false
 
-        changedFunc = (event, file) ->
-            console.log "#{file} was changed"
+        return
 
-            match = path.basename(file, path.extname(file)) + ".*"
-            match = match.replace new RegExp("spec", "i"), ""
+    # Vim seems to change a file multiple times, with non-scientific testing
+    # the only time we didn't duplicate the call to onChanged was at 2.5s
+    # Passing true to have onChanged run on the leading edge of the timeout
+    onChanged = _.debounce changedFunc, 2500, true
 
-            argv = [].concat baseArgv, ["--match", match]
-            runExternal argv.shift(), argv, (code) ->
-                # run everything if we fixed some bugs
-                if code is 0
-                    runEverything() unless lastRunSuccessful
-                else
-                    lastRunSuccessful = false
+    gaze watchPatterns, (err, watcher) ->
+      # Get all watched files
+      console.log("Watching for changes in " + loadPath)
 
-                return
-
-        # Vim seems to change a file multiple times, with non-scientific testing
-        # the only time we didn't duplicate the call to onChanged was at 2.5s
-        # Passing true to have onChanged run on the leading edge of the timeout
-        onChanged = _.debounce changedFunc, 2500, true
-
-        gaze watchPatterns, (err, watcher) ->
-            # Get all watched files
-            console.log("Watching for changes in " + loadPath)
-
-            # On file changed
-            @on('all', onChanged)
-            return
+      # On file changed
+      @on('all', onChanged)
+      return
 
 
-    loadPathFunc(loadPath) for loadPath in loadPaths
+  loadPathFunc(loadPath) for loadPath in loadPaths
 
 
-    watchFolders.forEach (watchPath) ->
-        # If watchPath is just a single file, we should just watch that file
-        stats = fs.statSync watchPath
-        if stats.isFile()
-            watchPatterns = watchPath
-        else
-            watchPatterns = patterns.map (p) ->
-                return path.join watchPath, p
+  watchFolders.forEach (watchPath) ->
+    # If watchPath is just a single file, we should just watch that file
+    stats = fs.statSync watchPath
+    if stats.isFile()
+      watchPatterns = watchPath
+    else
+      watchPatterns = patterns.map (p) ->
+        return path.join watchPath, p
 
-        # We debounce runEverything here due to the Vim issue described above.
-        onChanged = _.debounce runEverything, 2500, true
+    # We debounce runEverything here due to the Vim issue described above.
+    onChanged = _.debounce runEverything, 2500, true
 
 
-        gaze watchPatterns, (err, watcher) ->
-            console.log "Watching for changes in #{watchPath}"
+    gaze watchPatterns, (err, watcher) ->
+      console.log "Watching for changes in #{watchPath}"
 
-            @on 'all', onChanged
-            return
+      @on 'all', onChanged
+      return
 
-    runEverything()
+  runEverything()
 
 module.exports = {start}
