@@ -1,23 +1,21 @@
 {
   "name": "jasmine-node",
-  "version": "2.0.0-beta4",
+  "version": "2.2.1",
   "description": "DOM-less simple JavaScript BDD testing framework for Node",
-  "contributors": [
-    "Chris Moultrie <chris@moultrie.org>"
-  ],
-  "homepage": "https://github.com/mhevery/jasmine-node",
+  "main": "./lib/jasmine-node",
+  "scripts": {
+    "test": "node bin/jasmine-node ./spec"
+  },
+  "bin": {
+    "jasmine-node": "./bin/jasmine-node"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/mhevery/jasmine-node.git"
+    "url": "https://github.com/aleclarson/jasmine-node.git"
   },
   "keywords": [
     "testing",
     "bdd"
-  ],
-  "author": "Misko Hevery <misko@hevery.com>",
-  "maintainers": [
-    "Martin Häger <martin.haeger@gmail.com>",
-    "Chris Moultrie <chris@moultrie.org>"
   ],
   "licenses": [
     "MIT"
@@ -39,17 +37,7 @@
     "grunt-contrib-watch": "~0.5.3",
     "grunt": "~0.4.2"
   },
-  "bin": {
-    "jasmine-node": "./bin/jasmine-node"
-  },
   "preferGlobal": true,
-  "main": "./lib/jasmine-node",
-  "scripts": {
-    "test": "node bin/jasmine-node ./spec"
-  },
-  "bugs": {
-    "url": "https://github.com/mhevery/jasmine-node/issues"
-  },
   "license": "ISC",
   "engines": {
     "node": ">=0.10.0"
