@@ -23,70 +23,8 @@ boot = (jasmineRequire, clockCallback) ->
   jasmine.JUnitReporter    = junitReporter.JUnitReporter
   jasmine.GrowlReporter    = growlReporter
 
-  ###
-  ## The Global Interface
-  *
-  Build up the functions that will be exposed as the Jasmine public interface. A project can customize, rename or alias any of these functions as desired, provided the implementation remains unchanged.
-  ###
-  jasmineInterface =
-    describe: (description, specDefinitions) ->
-      return env.describe description, specDefinitions
-
-    xdescribe: (description, specDefinitions) ->
-      return env.xdescribe description, specDefinitions
-
-    it: (desc, func) ->
-      spec =
-        done: false
-        doneFunc: -> return
-        returned: false
-      wrappedFunc = func
-      wrappedDone = ->
-        spec.done = true
-        if spec.returned
-          return spec.doneFunc()
-        return
-
-      if func.length > 0
-        wrappedFunc = (done) ->
-          spec.doneFunc = done
-          func.call(@, wrappedDone)
-          spec.returned = true
-          if spec.done
-            return spec.doneFunc()
-          return
-
-
-      return env.it desc, wrappedFunc
-
-    xit: (desc, func) ->
-      return env.xit desc, func
-
-    beforeEach: (beforeEachFunction) ->
-      return env.beforeEach(beforeEachFunction)
-
-    afterEach: (afterEachFunction) ->
-      return env.afterEach(afterEachFunction)
-
-    expect: (actual) ->
-      return env.expect(actual)
-
-    pending: ->
-      return env.pending()
-
-    spyOn: (obj, methodName) ->
-      return env.spyOn(obj, methodName)
-
-    # setTimeout: (callback, millis) ->
-    #     return env.clock.setTimeout(callback, millis)
-
-    # setInterval: (callback, millis) ->
-    #     return env.clock.setInterval(callback, millis)
-
-  ###
-  Add all of the Jasmine global/public interface to the proper global, so a project can use the public interface directly. For example, calling `describe` in specs instead of `jasmine.getEnv().describe`.
-  ###
-  extend global, jasmineInterface
+  # The global.jasmine interface
+  extend global, jasmineRequire.interface jasmine, jasmine.getEnv()
   global.jasmine = jasmine
 
   clockInstaller = jasmine.currentEnv_.clock.install
