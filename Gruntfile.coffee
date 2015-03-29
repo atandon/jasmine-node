@@ -25,7 +25,7 @@ module.exports = (grunt) ->
                 ext: '.js'
         exec:
             test:
-                cmd: "node bin/jasmine-node --coffee --noColor --captureExceptions spec/"
+                cmd: "node bin/jasmine-node --coffee --matchAll spec/"
 
 
     grunt.loadNpmTasks 'grunt-contrib-watch'
