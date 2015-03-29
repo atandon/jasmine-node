@@ -68,7 +68,7 @@ loadJasmine = ->
 
     return
 
-  jasmineEnv = booter.boot contextObj.window.jasmineRequire, clockCallback
+  jasmineEnv = booter.boot contextObj.jasmineRequire, clockCallback
   return jasmineEnv
 
 # Define helper functions
