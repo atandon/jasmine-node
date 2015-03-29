@@ -61,7 +61,7 @@ minimistOpts =
 exitCode = 0
 
 printVersion = ->
-  console.log "2.0.0-beta4"
+  console.log JSON.parse(fs.readFileSync path.normalize(__dirname + "/../../package.json"), "utf8").version
   process.exit 0
   return
 
