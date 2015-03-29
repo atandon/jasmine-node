@@ -30,7 +30,7 @@ sortFiles = (specs) ->
   # Sorts spec paths in ascending alphabetical order to be able to
   #   run tests in a deterministic order.
   specs.sort (a, b) ->
-  return a.localeCompare b
+    return a.localeCompare b
   return specs
 
 module.exports = {find, sortFiles}
