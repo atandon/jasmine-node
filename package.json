@@ -1,11 +1,9 @@
 {
   "name": "jasmine-node",
-  "version": "2.2.1",
-  "description": "DOM-less simple JavaScript BDD testing framework for Node",
+  "version": "2.0.0",
+  "description": "Run Jasmine tests for Node.js scripts",
+  "prefersGlobal": true,
   "main": "./lib/jasmine-node",
-  "scripts": {
-    "test": "node bin/jasmine-node ./spec"
-  },
   "bin": {
     "jasmine-node": "./bin/jasmine-node"
   },
@@ -13,10 +11,6 @@
     "type": "git",
     "url": "https://github.com/aleclarson/jasmine-node.git"
   },
-  "keywords": [
-    "testing",
-    "bdd"
-  ],
   "licenses": [
     "MIT"
   ],
@@ -36,10 +30,5 @@
     "grunt-contrib-coffee": "~0.10.1",
     "grunt-contrib-watch": "~0.5.3",
     "grunt": "~0.4.2"
-  },
-  "preferGlobal": true,
-  "license": "ISC",
-  "engines": {
-    "node": ">=0.10.0"
   }
 }
